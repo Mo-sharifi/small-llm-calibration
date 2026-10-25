@@ -1,0 +1,21 @@
+{
+  "project": "p1_calibration_small_llms",
+  "smoke_mode": false,
+  "gpu": "Tesla T4",
+  "torch_version": "2.11.0+cu130",
+  "start_time": "2026-10-25T15:12:32Z",
+  "end_time": "2026-10-25T15:41:46Z",
+  "seed": 0,
+  "models": [
+    "Qwen/Qwen2.5-0.5B-Instruct",
+    "Qwen/Qwen2.5-1.5B-Instruct",
+    "Qwen/Qwen2.5-3B-Instruct",
+    "Qwen/Qwen2.5-7B-Instruct"
+  ],
+  "file_counts": {
+    "qwen2.5_0.5b_instruct.jsonl": 1000,
+    "qwen2.5_1.5b_instruct.jsonl": 1000,
+    "qwen2.5_3b_instruct.jsonl": 1000,
+    "qwen2.5_7b_instruct.jsonl": 995
+  }
+}
