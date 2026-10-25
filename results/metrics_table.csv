@@ -1,0 +1,49 @@
+model_slug,model_label,size_b,dataset,dataset_name,n_samples,accuracy,method_key,method,auroc,ece,brier
+qwen2.5_0.5b_instruct,0.5B,0.5,overall,Overall (Combined),1000,0.386,conf_token_prob,Token Prob,0.8047037180807075,0.3305980733341457,0.2967830851213932
+qwen2.5_0.5b_instruct,0.5B,0.5,overall,Overall (Combined),1000,0.386,conf_verbalized,Verbalized,0.6176309260603198,0.47168999999999983,0.4531823
+qwen2.5_0.5b_instruct,0.5B,0.5,overall,Overall (Combined),1000,0.386,conf_p_true,P(True),0.4888103154377141,0.4730355656635405,0.473841988830072
+qwen2.5_0.5b_instruct,0.5B,0.5,overall,Overall (Combined),1000,0.386,conf_consistency,Consistency,0.7683266949081027,0.23679999999999995,0.25096
+qwen2.5_0.5b_instruct,0.5B,0.5,trivia_qa,TriviaQA,500,0.168,conf_token_prob,Token Prob,0.6816907051282052,0.44694212218584417,0.3376024954833588
+qwen2.5_0.5b_instruct,0.5B,0.5,trivia_qa,TriviaQA,500,0.168,conf_verbalized,Verbalized,0.5047075320512819,0.6482999999999999,0.5816226
+qwen2.5_0.5b_instruct,0.5B,0.5,trivia_qa,TriviaQA,500,0.168,conf_p_true,P(True),0.6549049908424909,0.6697464017742217,0.6123569945100564
+qwen2.5_0.5b_instruct,0.5B,0.5,trivia_qa,TriviaQA,500,0.168,conf_consistency,Consistency,0.6208075778388279,0.24679999999999996,0.23336
+qwen2.5_0.5b_instruct,0.5B,0.5,sciq,SciQ,500,0.604,conf_token_prob,Token Prob,0.7538296876045218,0.21487901224966552,0.2559636747594276
+qwen2.5_0.5b_instruct,0.5B,0.5,sciq,SciQ,500,0.604,conf_verbalized,Verbalized,0.5467171717171717,0.2950799999999998,0.324742
+qwen2.5_0.5b_instruct,0.5B,0.5,sciq,SciQ,500,0.604,conf_p_true,P(True),0.4248444712020871,0.2884164480821396,0.33532698315008763
+qwen2.5_0.5b_instruct,0.5B,0.5,sciq,SciQ,500,0.604,conf_consistency,Consistency,0.6880811425513412,0.23080000000000003,0.2685600000000001
+qwen2.5_1.5b_instruct,1.5B,1.5,overall,Overall (Combined),1000,0.618,conf_token_prob,Token Prob,0.8556947762584931,0.20378979024438365,0.20171435571141855
+qwen2.5_1.5b_instruct,1.5B,1.5,overall,Overall (Combined),1000,0.618,conf_verbalized,Verbalized,0.4135066673444145,0.33845,0.3568125
+qwen2.5_1.5b_instruct,1.5B,1.5,overall,Overall (Combined),1000,0.618,conf_p_true,P(True),0.640675036852539,0.5294238120301876,0.5367237646518146
+qwen2.5_1.5b_instruct,1.5B,1.5,overall,Overall (Combined),1000,0.618,conf_consistency,Consistency,0.829082583574781,0.1624,0.17336000000000001
+qwen2.5_1.5b_instruct,1.5B,1.5,trivia_qa,TriviaQA,500,0.352,conf_token_prob,Token Prob,0.800733024691358,0.3470876340556523,0.2978603677545157
+qwen2.5_1.5b_instruct,1.5B,1.5,trivia_qa,TriviaQA,500,0.352,conf_verbalized,Verbalized,0.555976430976431,0.612,0.6041700000000001
+qwen2.5_1.5b_instruct,1.5B,1.5,trivia_qa,TriviaQA,500,0.352,conf_p_true,P(True),0.7975063131313131,0.18979972776957255,0.2100691441175984
+qwen2.5_1.5b_instruct,1.5B,1.5,trivia_qa,TriviaQA,500,0.352,conf_consistency,Consistency,0.7664579826038159,0.22079999999999997,0.23952000000000004
+qwen2.5_1.5b_instruct,1.5B,1.5,sciq,SciQ,500,0.884,conf_token_prob,Token Prob,0.5771571227960681,0.07060391972424634,0.10556834366832131
+qwen2.5_1.5b_instruct,1.5B,1.5,sciq,SciQ,500,0.884,conf_verbalized,Verbalized,0.527968481822437,0.08290000000000011,0.109455
+qwen2.5_1.5b_instruct,1.5B,1.5,sciq,SciQ,500,0.884,conf_p_true,P(True),0.5084256514276798,0.8696053521085443,0.8633783851860308
+qwen2.5_1.5b_instruct,1.5B,1.5,sciq,SciQ,500,0.884,conf_consistency,Consistency,0.5574387579965674,0.1048,0.1072
+qwen2.5_3b_instruct,3.0B,3.0,overall,Overall (Combined),1000,0.671,conf_token_prob,Token Prob,0.908624336946625,0.2224154880970689,0.19751418972995285
+qwen2.5_3b_instruct,3.0B,3.0,overall,Overall (Combined),1000,0.671,conf_verbalized,Verbalized,0.49007288491069445,0.38215,0.37171750000000003
+qwen2.5_3b_instruct,3.0B,3.0,overall,Overall (Combined),1000,0.671,conf_p_true,P(True),0.8118264714009396,0.5761948268371809,0.5731077663850661
+qwen2.5_3b_instruct,3.0B,3.0,overall,Overall (Combined),1000,0.671,conf_consistency,Consistency,0.8235859013675547,0.171,0.1674
+qwen2.5_3b_instruct,3.0B,3.0,trivia_qa,TriviaQA,500,0.412,conf_token_prob,Token Prob,0.8246813288422165,0.38023316196587825,0.3286465409002888
+qwen2.5_3b_instruct,3.0B,3.0,trivia_qa,TriviaQA,500,0.412,conf_verbalized,Verbalized,0.7282791757479691,0.4082,0.38576000000000005
+qwen2.5_3b_instruct,3.0B,3.0,trivia_qa,TriviaQA,500,0.412,conf_p_true,P(True),0.8400039627501487,0.22240824684322463,0.2162495763307679
+qwen2.5_3b_instruct,3.0B,3.0,trivia_qa,TriviaQA,500,0.412,conf_consistency,Consistency,0.7789115646258503,0.282,0.27320000000000005
+qwen2.5_3b_instruct,3.0B,3.0,sciq,SciQ,500,0.93,conf_token_prob,Token Prob,0.8070046082949309,0.06628948767163069,0.06638183855961692
+qwen2.5_3b_instruct,3.0B,3.0,sciq,SciQ,500,0.93,conf_verbalized,Verbalized,0.5125960061443933,0.4223,0.3576750000000001
+qwen2.5_3b_instruct,3.0B,3.0,sciq,SciQ,500,0.93,conf_p_true,P(True),0.463778801843318,0.9299814068311373,0.9299659564393644
+qwen2.5_3b_instruct,3.0B,3.0,sciq,SciQ,500,0.93,conf_consistency,Consistency,0.5951152073732718,0.062399999999999956,0.061599999999999995
+qwen2.5_7b_instruct,7.0B,7.0,overall,Overall (Combined),995,0.7366834170854272,conf_token_prob,Token Prob,0.8015371317288567,0.1455749136736732,0.16882258393827354
+qwen2.5_7b_instruct,7.0B,7.0,overall,Overall (Combined),995,0.7366834170854272,conf_verbalized,Verbalized,0.5041864969850972,0.20907537688442202,0.27088010050251254
+qwen2.5_7b_instruct,7.0B,7.0,overall,Overall (Combined),995,0.7366834170854272,conf_p_true,P(True),0.5382694771044437,0.5706008699405204,0.5714446363066287
+qwen2.5_7b_instruct,7.0B,7.0,overall,Overall (Combined),995,0.7366834170854272,conf_consistency,Consistency,0.7845151682409424,0.14633165829145728,0.1542110552763819
+qwen2.5_7b_instruct,7.0B,7.0,trivia_qa,TriviaQA,495,0.5272727272727272,conf_token_prob,Token Prob,0.8354946458394734,0.316763371053507,0.2848564712986126
+qwen2.5_7b_instruct,7.0B,7.0,trivia_qa,TriviaQA,495,0.5272727272727272,conf_verbalized,Verbalized,0.7302862101712676,0.3086464646464645,0.3105923232323232
+qwen2.5_7b_instruct,7.0B,7.0,trivia_qa,TriviaQA,495,0.5272727272727272,conf_p_true,P(True),0.8689704293152569,0.19367119707369249,0.195579629855693
+qwen2.5_7b_instruct,7.0B,7.0,trivia_qa,TriviaQA,495,0.5272727272727272,conf_consistency,Consistency,0.7523250483020599,0.24686868686868682,0.2636767676767677
+qwen2.5_7b_instruct,7.0B,7.0,sciq,SciQ,500,0.944,conf_token_prob,Token Prob,0.6998335351089587,0.045082276438448816,0.05394903545153789
+qwen2.5_7b_instruct,7.0B,7.0,sciq,SciQ,500,0.944,conf_verbalized,Verbalized,0.5401029055690072,0.26630000000000015,0.23156499999999997
+qwen2.5_7b_instruct,7.0B,7.0,sciq,SciQ,500,0.944,conf_p_true,P(True),0.4456719128329298,0.9437612460786804,0.9435509926930549
+qwen2.5_7b_instruct,7.0B,7.0,sciq,SciQ,500,0.944,conf_consistency,Consistency,0.6401710048426149,0.04680000000000002,0.045840000000000006
