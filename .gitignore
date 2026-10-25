@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+data/
+out/
+*.zip
+*.safetensors
+*.bin
+report/*.aux
+report/*.log
+report/*.out
+report/*.bbl
+report/*.blg

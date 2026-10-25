@@ -1,0 +1,9 @@
+[project]
+name = "p1-calibration-small-llms"
+version = "0.1.0"
+description = "Confidence calibration of small open LLMs (academic research project)"
+requires-python = ">=3.12,<3.13"
+dependencies = ["torch", "transformers", "accelerate", "bitsandbytes", "datasets", "numpy", "pandas", "scikit-learn", "matplotlib"]
+
+[dependency-groups]
+dev = ["jupyter", "nbconvert", "ipykernel"]
