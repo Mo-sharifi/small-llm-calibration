@@ -34,12 +34,12 @@ For small instruction-tuned language models (0.5B–7B parameters), which confid
 ### Evaluated Methods
 
 1. **Length-Normalized Token Probability ($c_{\text{tok}}$):** Geometric mean of token generation probabilities:
-   $$\exp\left( \frac{1}{N}\sum_{i=1}^N \ln p(t_i \mid t_{<i}) \right)$$
+   $$\exp\left( \frac{1}{N}\sum_{i=1}^N \ln p(t_i \mid t_{1:i-1}) \right)$$
 2. **Verbalized Confidence ($c_{\text{verb}}$):** Direct numerical prompting (0–100) normalized to $[0, 1]$:
    *"How confident are you that this answer is correct? Respond with only a number between 0 and 100."*
 3. **Self-Check $P(\text{True})$ ($c_{\text{ptrue}}$):** Normalized next-token probability of `True` vs. `False` when asked if the answer is correct:
    $$\frac{P(\text{True})}{P(\text{True}) + P(\text{False})}$$
-4. **Self-Consistency ($c_{\text{cons}}$):** Frequency of modal prediction across $K=5$ sampled generations ($T=0.7$, $\text{top\_p}=0.95$).
+4. **Self-Consistency ($c_{\text{cons}}$):** Frequency of modal prediction across $K = 5$ sampled generations ($T = 0.7$, `top_p = 0.95`).
 
 ---
 
