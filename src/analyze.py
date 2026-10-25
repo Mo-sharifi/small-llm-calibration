@@ -170,7 +170,7 @@ def generate_figures(df: pd.DataFrame, json_summary: Dict[str, Any], raw_data: D
     # -------------------------------------------------------------
     # Figure 1: AUROC vs Model Size (Full 2-column width: 7.0 in)
     # -------------------------------------------------------------
-    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.3), sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.5), sharey=True)
     datasets = [
         ("overall", "Combined (1,000 items)"),
         ("trivia_qa", "TriviaQA (500 items)"),
@@ -181,7 +181,6 @@ def generate_figures(df: pd.DataFrame, json_summary: Dict[str, Any], raw_data: D
         sub_df = df[df["dataset"] == d_key]
         for meth_col, meth_label in METHOD_KEYS:
             meth_sub = sub_df[sub_df["method"] == meth_label]
-            # Map values strictly to MODEL_ORDER order
             y_vals = []
             for slug, _, _ in MODEL_ORDER:
                 row = meth_sub[meth_sub["model_slug"] == slug]
@@ -193,22 +192,37 @@ def generate_figures(df: pd.DataFrame, json_summary: Dict[str, Any], raw_data: D
                 label=meth_label,
                 color=method_colors[meth_label],
                 marker=method_markers[meth_label],
+                linewidth=1.8,
+                markersize=5.5,
                 zorder=3,
             )
-        ax.set_title(title, fontweight="bold", pad=4)
-        ax.set_xlabel("Model Scale", labelpad=2)
+        ax.axhline(0.50, color="#666666", linestyle="--", linewidth=1.1, alpha=0.8, label="Chance (0.50)" if ax == axes[0] else "", zorder=2)
+        ax.set_title(title, fontweight="bold", fontsize=9.5, pad=3)
+        ax.set_xlabel("Model Scale", fontsize=8.5, labelpad=2)
         ax.set_xticks(x_pos)
-        ax.set_xticklabels(x_labels, fontweight="bold")
+        ax.set_xticklabels(x_labels, fontweight="bold", fontsize=8.0)
         ax.set_xlim(-0.25, len(x_pos) - 0.75)
-        ax.set_ylim(0.35, 0.98)
-        ax.set_yticks([0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
-        ax.axhline(0.5, color="#666666", linestyle="--", linewidth=1.0, alpha=0.8, label="Chance (0.50)" if ax == axes[0] else "", zorder=2)
-        ax.grid(True, linestyle=":", alpha=0.6, zorder=1)
+        ax.set_ylim(0.35, 1.02)
+        ax.set_yticks([0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+        ax.grid(True, linestyle=":", alpha=0.5, zorder=1)
         if ax == axes[0]:
-            ax.set_ylabel("AUROC (Discrimination)")
-            ax.legend(loc="lower right", framealpha=0.9, frameon=True, edgecolor="#cccccc")
+            ax.set_ylabel("AUROC (Discrimination)", fontsize=8.5)
 
-    plt.tight_layout(pad=0.5)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(
+        handles,
+        labels,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 1.01),
+        ncol=5,
+        frameon=True,
+        facecolor="#ffffff",
+        edgecolor="#cccccc",
+        fontsize=7.5,
+        handletextpad=0.3,
+        columnspacing=1.0,
+    )
+    plt.subplots_adjust(top=0.83, bottom=0.17, left=0.08, right=0.98, wspace=0.12)
     fig1_png = FIGURES_DIR / "fig1_auroc_vs_size.png"
     fig1_pdf = FIGURES_DIR / "fig1_auroc_vs_size.pdf"
     plt.savefig(fig1_png, dpi=300)
@@ -285,7 +299,7 @@ def generate_figures(df: pd.DataFrame, json_summary: Dict[str, Any], raw_data: D
     # -------------------------------------------------------------
     # Figure 3: ECE vs Model Size (Full 2-column width: 7.0 in)
     # -------------------------------------------------------------
-    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.3), sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.5), sharey=True)
     for ax, (d_key, title) in zip(axes, datasets):
         sub_df = df[df["dataset"] == d_key]
         for meth_col, meth_label in METHOD_KEYS:
@@ -301,21 +315,36 @@ def generate_figures(df: pd.DataFrame, json_summary: Dict[str, Any], raw_data: D
                 label=meth_label,
                 color=method_colors[meth_label],
                 marker=method_markers[meth_label],
+                linewidth=1.8,
+                markersize=5.5,
                 zorder=3,
             )
-        ax.set_title(title, fontweight="bold", pad=4)
-        ax.set_xlabel("Model Scale", labelpad=2)
+        ax.set_title(title, fontweight="bold", fontsize=9.5, pad=3)
+        ax.set_xlabel("Model Scale", fontsize=8.5, labelpad=2)
         ax.set_xticks(x_pos)
-        ax.set_xticklabels(x_labels, fontweight="bold")
+        ax.set_xticklabels(x_labels, fontweight="bold", fontsize=8.0)
         ax.set_xlim(-0.25, len(x_pos) - 0.75)
-        ax.set_ylim(-0.02, 0.72)
-        ax.set_yticks([0.0, 0.2, 0.4, 0.6])
-        ax.grid(True, linestyle=":", alpha=0.6, zorder=1)
+        ax.set_ylim(-0.02, 1.02)
+        ax.set_yticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+        ax.grid(True, linestyle=":", alpha=0.5, zorder=1)
         if ax == axes[0]:
-            ax.set_ylabel("ECE (Error) ↓")
-            ax.legend(loc="upper right", framealpha=0.9, frameon=True, edgecolor="#cccccc")
+            ax.set_ylabel("ECE (Calibration Error) ↓", fontsize=8.5)
 
-    plt.tight_layout(pad=0.5)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(
+        handles,
+        labels,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 1.01),
+        ncol=4,
+        frameon=True,
+        facecolor="#ffffff",
+        edgecolor="#cccccc",
+        fontsize=7.5,
+        handletextpad=0.3,
+        columnspacing=1.2,
+    )
+    plt.subplots_adjust(top=0.83, bottom=0.17, left=0.08, right=0.98, wspace=0.12)
     fig3_png = FIGURES_DIR / "fig3_ece_vs_size.png"
     fig3_pdf = FIGURES_DIR / "fig3_ece_vs_size.pdf"
     plt.savefig(fig3_png, dpi=300)
