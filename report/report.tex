@@ -1,22 +1,33 @@
 \documentclass[10pt,twocolumn]{article}
 \usepackage[utf8]{inputenc}
-\usepackage[margin=1.55cm]{geometry}
+\usepackage[margin=1.75cm,top=1.85cm,bottom=1.85cm]{geometry}
+\usepackage{times}
+\usepackage{mathptmx}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{microtype}
 \usepackage{cite}
 \usepackage{enumitem}
-\setlist{noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt}
+\setlist{noitemsep,topsep=1.5pt,parsep=0pt,partopsep=0pt}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{\thesection}{0.5em}{}
+\titlespacing*{\section}{0pt}{7pt plus 1pt minus 1pt}{3pt plus 1pt minus 1pt}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\subsection}{0pt}{5pt plus 1pt minus 1pt}{2pt plus 1pt minus 1pt}
+\titleformat{\subsubsection}{\normalsize\itshape}{\thesubsubsection}{0.5em}{}
+\titlespacing*{\subsubsection}{0pt}{4pt plus 1pt minus 1pt}{1pt plus 1pt minus 1pt}
+
 \usepackage[font=small,labelfont=bf,skip=3pt]{caption}
-\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}
-\setlength{\dbltextfloatsep}{6pt plus 2pt minus 2pt}
-\setlength{\floatsep}{4pt plus 2pt minus 2pt}
-\setlength{\dblfloatsep}{4pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{7pt plus 1pt minus 2pt}
+\setlength{\dbltextfloatsep}{7pt plus 1pt minus 2pt}
+\setlength{\floatsep}{5pt plus 1pt minus 1pt}
+\setlength{\dblfloatsep}{5pt plus 1pt minus 1pt}
+
 \usepackage{hyperref}
 \hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
 
-% Float placement parameters for 2-column layout
+% Float placement parameters
 \setcounter{topnumber}{3}
 \setcounter{bottomnumber}{3}
 \setcounter{totalnumber}{4}
@@ -24,70 +35,52 @@
 \renewcommand{\topfraction}{0.95}
 \renewcommand{\dbltopfraction}{0.95}
 \renewcommand{\textfraction}{0.05}
-\renewcommand{\floatpagefraction}{0.8}
-\renewcommand{\dblfloatpagefraction}{0.8}
+\renewcommand{\floatpagefraction}{0.85}
+\renewcommand{\dblfloatpagefraction}{0.85}
 
-\title{\textbf{Confidence Calibration of Small Open LLMs:\\Token Probability vs. Verbalized vs. Consistency}}
+\title{\LARGE\textbf{Confidence Calibration in Small Open Language Models:\\Token Probability vs. Verbalization and Consistency}}
+
 \author{
-  \textbf{Mohammadreza Sharifi}\\
+  \textbf{Mohammadreza Sharifi}\\[0.25em]
+  Department of Computer Science / Artificial Intelligence\\
+  Islamic Azad University, Tehran South Branch, Tehran, Iran\\
   \texttt{m.sharifi8080@gmail.com}
 }
 \date{October 2026}
 
 \begin{document}
-\maketitle
 
-\begin{abstract}
-Reliable deployment of Large Language Models (LLMs) requires trustworthy uncertainty estimation: models should exhibit high confidence when correct and low confidence when wrong. While recent literature on proprietary frontier models suggests that verbalized confidence often surpasses token probability, this empirical study investigates whether this finding holds for small open-weight instruction-tuned models (0.5B to 7B parameters). We evaluate four confidence estimation methods---token probability, verbalized 0--100 scoring, self-check P(True), and 5-sample self-consistency---across the Qwen2.5 model family on TriviaQA (open-domain QA) and SciQ (multiple-choice science QA), comprising 3,995 evaluated generations. Our results reveal a stark contrast: verbalized confidence fails systematically on small models, exhibiting mode collapse near 85--95\% confidence and near-random discriminative ability (AUROC 0.414--0.618). Conversely, length-normalized token probability and self-consistency consistently achieve high discrimination (AUROC up to 0.909) and lowest Expected Calibration Error (ECE down to 0.146), confirming that internal representation signals remain superior for small language models.
-\end{abstract}
+\twocolumn[
+  \begin{@twocolumnfalse}
+    \maketitle
+    \begin{abstract}
+      \small
+      Uncertainty quantification in Large Language Models (LLMs) is fundamental for trustworthy automated decision-making and efficient routing in small-to-large model cascades. While recent literature on proprietary frontier models suggests that verbalized confidence frequently matches or surpasses internal token probabilities, whether this empirical finding generalizes to resource-constrained small open-weight language models (0.5B to 7B parameters) remains critically unverified. In this work, we conduct a controlled empirical evaluation of four foundational confidence estimation methods---length-normalized token probability, verbalized numerical prompting (0--100), self-check next-token probability $P(\text{True})$, and 5-sample self-consistency---across the Qwen2.5 model family (0.5B, 1.5B, 3B, and 7B) on TriviaQA and SciQ, comprising 3,995 evaluated generations. Our results reveal that the reported superiority of verbalization fails completely on small language models: verbalized confidence suffers acute mode collapse near 85--95\% confidence regardless of correctness, yielding near-random discrimination (AUROC 0.414--0.618). In contrast, length-normalized token probabilities consistently achieve strong discrimination (AUROC up to 0.909), and self-consistency delivers the lowest calibration error (ECE down to 0.146). Furthermore, self-check $P(\text{True})$ demonstrates severe task-dependent failure on multiple-choice questions due to suggestibility bias. Our findings demonstrate that edge deployments and cost-efficient cascades must rely on internal token representations or sampled consistency rather than verbalized self-assessment.
+    \end{abstract}
+    \vspace{1.2em}
+  \end{@twocolumnfalse}
+]
 
 \section{Introduction}
-Uncertainty quantification in Large Language Models (LLMs) is fundamental for trustworthy AI, automated decision routing, and cascading architectures where small models defer uncertain queries to larger models~\cite{zhang2026confidence}. A well-calibrated confidence metric enables systems to reliably refuse answers or query human supervisors when generation correctness is uncertain.
+Reliable uncertainty quantification in Large Language Models (LLMs) is essential for automated verification, safe edge deployment, and cascading architectures where compact models defer uncertain queries to larger models~\cite{zhang2026confidence}. A well-calibrated confidence score enables a system to distinguish between correct generations and hallucinations, allowing safe escalation when predictive certainty is low.
 
-Prior investigations on large proprietary models (e.g., ChatGPT, GPT-4, Claude) by Tian et al.~\cite{tian2023just} observed that verbalized confidence (prompting the model to state a numerical confidence) frequently out-calibrates internal token probabilities. However, whether this finding generalizes to resource-constrained, small open-weight language models (0.5B to 7B parameters) remains critically under-explored. Small language models (SLMs) are widely deployed locally on edge devices and consumer hardware where internal logits are fully accessible.
+Prior investigations on large proprietary models (e.g., GPT-4, Claude) by Tian et al.~\cite{tian2023just} established that verbalized confidence (prompting the model to state a numerical probability) often outperforms raw token probabilities. However, whether this observation generalizes to resource-constrained small language models (0.5B to 7B parameters) remains fundamentally unverified. Small language models (SLMs) are increasingly deployed locally on consumer hardware and edge devices where full internal logit access is naturally available.
 
-\textbf{Research Question:} For small instruction-tuned LLMs (0.5B--7B), which confidence estimation method best separates correct from incorrect answers, and does the method ranking vary with parameter scale?
+\textbf{Research Question:} For small instruction-tuned language models (0.5B--7B), which confidence estimation method best separates correct from incorrect answers, and does the method ranking vary with parameter scale?
 
-This work presents a controlled empirical study evaluating four confidence extraction techniques across four model sizes in a single architectural family (Qwen2.5) on identical benchmark queries. Our contributions are:
+This work presents a controlled empirical study benchmarking four foundational confidence extraction techniques across four model sizes within the Qwen2.5 family on identical test samples. Our contributions are:
 \begin{itemize}
-    \item \textbf{Comprehensive scaling sweep:} We benchmark four distinct confidence extraction methods across Qwen2.5-0.5B, 1.5B, 3B, and 7B on both open-domain generation (TriviaQA) and multiple-choice QA (SciQ).
-    \item \textbf{Failure analysis of verbalized confidence:} We provide empirical proof that verbalized confidence fails on small models due to severe mode collapse (near-uniform high numbers regardless of correctness), producing AUROC values comparable to random guessing (0.414--0.504).
-    \item \textbf{Signal hierarchy for small LLMs:} We demonstrate that length-normalized token probability and self-consistency consistently yield the strongest separation between right and wrong predictions (AUROC 0.768--0.909, ECE 0.146--0.237).
+    \item \textbf{Controlled scaling sweep:} We benchmark four distinct confidence elicitation methods across Qwen2.5-0.5B, 1.5B, 3B, and 7B on open-domain generation (TriviaQA) and multiple-choice QA (SciQ) across 3,995 evaluated generations.
+    \item \textbf{Failure analysis of verbalization:} We show that verbalized confidence fails systematically on small models due to severe mode collapse (clustering at 85--95\%), producing near-random AUROC scores (0.414--0.504).
+    \item \textbf{Signal hierarchy for edge models:} We demonstrate that length-normalized token probability and self-consistency consistently yield the highest discrimination (AUROC up to 0.909) and lowest calibration error (ECE down to 0.146).
 \end{itemize}
 
 \section{Related Work}
-\textbf{Confidence Elicitation in LLMs.} Early work by Kadavath et al.~\cite{kadavath2022language} demonstrated that language models can evaluate the validity of their claims using a self-check next-token probability $P(\text{True})$. Xiong et al.~\cite{xiong2023can} evaluated confidence elicitation across multiple LLMs, observing that verbalized confidence is frequently overconfident but improves with model scale. Tian et al.~\cite{tian2023just} showed that RLHF-tuned frontier models can verbalize well-calibrated probabilities that exceed token log-probabilities in discriminative tasks.
+\textbf{Confidence Elicitation in LLMs.} Early work by Kadavath et al.~\cite{kadavath2022language} demonstrated that language models can evaluate claim validity via self-check probability $P(\text{True})$. Xiong et al.~\cite{xiong2023can} evaluated confidence elicitation across multiple LLMs, observing that verbalized confidence exhibits substantial overconfidence that partially mitigates with scale. Tian et al.~\cite{tian2023just} observed that RLHF-tuned frontier models can verbalize calibrated probabilities that match or exceed token log-probabilities in discriminative tasks.
 
-\textbf{Calibration Challenges and Post-Processing.} Recent work has highlighted distortions in verbalized probability distributions. Wang et al.~\cite{wang2024calibrating} analyzed the ``re-softmax'' issue when models output categorical probability distributions. Wang \& Stengel-Eskin~\cite{wang2025calibrating} linked overconfidence to suggestibility bias, proposing distractor normalization (DiNCo). In collaborative cascades, Zhang et al.~\cite{zhang2026confidence} demonstrated that cost-efficient reasoning requires explicit confidence calibration rewards to prevent small models from prematurely claiming correctness.
+\textbf{Distortions and Calibration Biases.} Recent literature highlights structural distortions in prompt-elicited distributions. Wang et al.~\cite{wang2024calibrating} analyzed the ``re-softmax'' distortion when models output categorical probabilities. Wang \& Stengel-Eskin~\cite{wang2025calibrating} linked verbalized overconfidence to suggestibility bias, proposing distractor normalization. In collaborative cascades, Zhang et al.~\cite{zhang2026confidence} showed that cost-efficient reasoning requires explicit confidence calibration rewards to prevent small models from prematurely claiming correctness.
 
-\textbf{Our Distinction.} Unlike prior work focusing on proprietary frontier APIs or post-hoc training intervention, we conduct a zero-training, controlled evaluation of four foundational confidence methods across a single model family at 0.5B, 1.5B, 3B, and 7B parameter scales on identical benchmark samples.
-
-\section{Experimental Setup}
-
-\subsection{Models and Hardware}
-We evaluate the instruction-tuned Qwen2.5 family~\cite{qwen2024qwen25}:
-\begin{enumerate}
-    \item \texttt{Qwen/Qwen2.5-0.5B-Instruct} (fp16)
-    \item \texttt{Qwen/Qwen2.5-1.5B-Instruct} (fp16)
-    \item \texttt{Qwen/Qwen2.5-3B-Instruct} (fp16)
-    \item \texttt{Qwen/Qwen2.5-7B-Instruct} (4-bit NF4 quantized via bitsandbytes)
-\end{enumerate}
-All inference runs were executed on a single Nvidia Tesla T4 GPU (16\,GB VRAM).
-
-\subsection{Datasets and Sampling}
-We evaluate on two complementary question-answering tasks:
-\begin{itemize}
-    \item \textbf{TriviaQA}~\cite{joshi2017triviaqa}: Open-domain question answering (\texttt{rc.nocontext} validation split). Correctness is evaluated via alias matching using standard normalization (lowercasing, punctuation and article removal) against ground-truth alias lists.
-    \item \textbf{SciQ}~\cite{welbl2017crowdsourcing}: Multiple-choice science examination questions (test split). Each question provides 4 alphabetically sorted choices (A--D). Correctness is evaluated by regex extraction of the chosen option letter.
-\end{itemize}
-We drew 500 questions per dataset with fixed seed 0, saving exact IDs to ensure 100\% reproducibility. In total, 3,995 full evaluations were collected across all four models.
-
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=\textwidth]{figures/fig1_auroc_vs_size.pdf}
-    \caption{\textbf{Discrimination Performance (AUROC vs.\ Model Size).} Area Under the ROC Curve across model scales for four confidence estimation methods on Combined (left), TriviaQA (center), and SciQ (right). Token probability (blue) and self-consistency (orange) maintain robust discrimination across sizes, whereas verbalized confidence (red) collapses near or below random baseline (0.50).}
-    \label{fig:auroc}
-\end{figure*}
+\textbf{Our Distinction.} While prior studies focused on API-accessible frontier models or post-hoc training interventions, we conduct a zero-shot, controlled evaluation of four foundational confidence methods across a single model family from 0.5B to 7B parameters on identical test samples.
 
 \begin{table*}[t]
 \centering
@@ -124,21 +117,48 @@ We drew 500 questions per dataset with fixed seed 0, saving exact IDs to ensure 
 \end{tabular}
 \end{table*}
 
+\section{Experimental Setup}
+
+\subsection{Models and Compute Environment}
+We evaluate four scales of the instruction-tuned Qwen2.5 family~\cite{qwen2024qwen25}:
+\begin{enumerate}
+    \item \texttt{Qwen/Qwen2.5-0.5B-Instruct} (fp16)
+    \item \texttt{Qwen/Qwen2.5-1.5B-Instruct} (fp16)
+    \item \texttt{Qwen/Qwen2.5-3B-Instruct} (fp16)
+    \item \texttt{Qwen/Qwen2.5-7B-Instruct} (4-bit NF4 quantized via bitsandbytes)
+\end{enumerate}
+All inference runs were executed on a dedicated Nvidia Tesla T4 GPU (16\,GB VRAM).
+
+\subsection{Datasets and Answer Verification}
+We test on two complementary question-answering benchmarks:
+\begin{itemize}
+    \item \textbf{TriviaQA}~\cite{joshi2017triviaqa}: Open-domain question answering (\texttt{rc.nocontext} validation split). Verification is performed via strict alias matching with normalization (lowercasing, punctuation, and article removal) against ground-truth alias lists.
+    \item \textbf{SciQ}~\cite{welbl2017crowdsourcing}: Multiple-choice science examination questions (test split). Each question presents 4 alphabetically sorted options (A--D). Correctness is determined by regex extraction of the chosen option letter.
+\end{itemize}
+We drew 500 questions per dataset using fixed seed 0, saving exact item IDs. Across all four models, 3,995 total generations were evaluated.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fig1_auroc_vs_size.pdf}
+    \caption{\textbf{Discrimination Performance (AUROC vs.\ Model Scale).} Area Under the ROC Curve across model scales for four confidence estimation methods on Combined (left), TriviaQA (center), and SciQ (right). Token probability (blue) and self-consistency (orange) maintain robust discrimination across scales, while verbalized confidence (red) collapses near chance level (0.50).}
+    \label{fig:auroc}
+\end{figure*}
+
 \subsection{Confidence Estimation Methods}
 For each test item, the model first generates an answer using greedy decoding. We evaluate four confidence signals:
 \begin{enumerate}
     \item \textbf{Token Probability ($c_{\text{tok}}$):} Length-normalized geometric mean of chosen tokens:
     $$c_{\text{tok}} = \exp\left( \frac{1}{N}\sum_{i=1}^N \ln p(t_i \mid t_{<i}) \right)$$
     \item \textbf{Verbalized Confidence ($c_{\text{verb}}$):} The model is prompted with the question and its greedy answer: \textit{``How confident are you that this answer is correct? Respond with only a number between 0 and 100.''} The elicited integer is divided by 100 to yield $c_{\text{verb}} \in [0, 1]$.
-    \item \textbf{Self-Check P(True) ($c_{\text{ptrue}}$):} Following Kadavath et al.~\cite{kadavath2022language}, the model evaluates its own answer: \textit{``Is this answer correct? Answer True or False.''} We compute next-token probabilities over True and False tokens:
+    \item \textbf{Self-Check P(True) ($c_{\text{ptrue}}$):} Following Kadavath et al.~\cite{kadavath2022language}, the model evaluates its own prediction: \textit{``Is this answer correct? Answer True or False.''} We compute next-token probabilities over True and False tokens:
     $$c_{\text{ptrue}} = \frac{P(\text{True})}{P(\text{True}) + P(\text{False})}$$
     \item \textbf{Self-Consistency ($c_{\text{cons}}$):} We draw $K=5$ sampled generations at temperature $T=0.7$ ($\text{top\_p}=0.95$). Confidence is the fraction of sampled responses that agree with the greedy prediction ($c_{\text{cons}} \in \{0.0, 0.2, 0.4, 0.6, 0.8, 1.0\}$).
 \end{enumerate}
 
 \subsection{Evaluation Metrics}
-We compute:
+We report three complementary metrics:
 \begin{itemize}
-    \item \textbf{AUROC} (Area Under the ROC Curve): Measures how well confidence ranks correct answers above incorrect ones (threshold-independent).
+    \item \textbf{AUROC} (Area Under the ROC Curve): Measures threshold-independent separation between correct and incorrect predictions.
     \item \textbf{ECE} (Expected Calibration Error): Grouped into $M=10$ equal-width bins $B_m \subseteq [0, 1]$:
     $$\text{ECE} = \sum_{m=1}^{10} \frac{|B_m|}{N} \left| \text{acc}(B_m) - \text{conf}(B_m) \right|$$
     \item \textbf{Brier Score}: Mean squared error $\frac{1}{N}\sum (c_i - y_i)^2$.
@@ -147,32 +167,31 @@ We compute:
 \begin{figure*}[t]
     \centering
     \includegraphics[width=\textwidth]{figures/fig2_reliability_diagrams.pdf}
-    \caption{\textbf{Reliability Diagrams for Qwen2.5-0.5B (top) and Qwen2.5-7B (bottom).} Empirical accuracy vs.\ confidence across 10 equal bins. Dashed diagonal indicates perfect calibration. Consistency and Token Probability follow the diagonal closely, while Verbalized and P(True) suffer from extreme overconfidence and severe probability clustering.}
+    \caption{\textbf{Reliability Diagrams for Qwen2.5-0.5B (top) and Qwen2.5-7B (bottom).} Empirical accuracy vs.\ confidence across 10 equal bins. Dashed diagonal indicates perfect calibration. Red horizontal markers indicate calibration gaps. Consistency and Token Probability adhere closely to the diagonal, while Verbalized and P(True) exhibit extreme overconfidence clustering.}
     \label{fig:reliability}
 \end{figure*}
 
 \section{Results and Empirical Analysis}
-
 Table~\ref{tab:metrics} presents the complete benchmark results across all 4 models and 4 confidence methods. Figure~\ref{fig:auroc} illustrates the scaling trajectories of discrimination (AUROC).
 
 \subsection{Task Accuracy Scaling}
-Raw task performance exhibits expected scaling behavior. On combined benchmarks, accuracy rises monotonically: 38.6\% (0.5B) $\to$ 61.8\% (1.5B) $\to$ 67.1\% (3.0B) $\to$ 73.7\% (7.0B). On multiple-choice SciQ, models achieve high accuracy rapidly (60.4\% for 0.5B up to 94.4\% for 7.0B), whereas open-domain TriviaQA proves substantially more challenging (16.8\% for 0.5B up to 52.7\% for 7.0B).
+Raw task performance exhibits expected scaling behavior. On combined benchmarks, accuracy rises monotonically: 38.6\% (0.5B) $\to$ 61.8\% (1.5B) $\to$ 67.1\% (3.0B) $\to$ 73.7\% (7.0B). Multiple-choice SciQ reaches high accuracy rapidly (60.4\% at 0.5B to 94.4\% at 7.0B), whereas open-domain TriviaQA presents substantial challenge (16.8\% at 0.5B to 52.7\% at 7.0B).
 
 \subsection{Superiority of Token Probability and Consistency}
-Across all model scales, length-normalized \textbf{Token Probability} consistently delivers the highest discriminative power:
+Across all parameter scales, length-normalized \textbf{Token Probability} consistently delivers the highest discriminative power:
 \begin{itemize}
     \item On Combined data, Token Prob achieves AUROC of \textbf{0.805} (0.5B), \textbf{0.856} (1.5B), \textbf{0.909} (3.0B), and \textbf{0.802} (7.0B).
     \item On TriviaQA open-domain generation, Token Prob AUROC increases steadily from 0.682 (0.5B) to 0.835 (7.0B).
 \end{itemize}
 \textbf{Self-Consistency} delivers comparable discriminative capability (Combined AUROC 0.768--0.829) while achieving the lowest calibration error across almost all configurations: ECE of 0.237 on 0.5B, dropping to \textbf{0.146} on 7.0B. Sampling 5 paths at $T=0.7$ provides an effective proxy for epistemic uncertainty.
 
-\subsection{The Failure of Verbalized Confidence}
+\subsection{Failure of Verbalized Confidence}
 In sharp contrast to findings on RLHF frontier models~\cite{tian2023just}, \textbf{verbalized confidence fails catastrophically on small models}:
 \begin{itemize}
     \item On Combined queries, Verbalized AUROC remains near chance level across sizes: 0.618 at 0.5B, collapsing to \textbf{0.414} at 1.5B, \textbf{0.490} at 3.0B, and \textbf{0.504} at 7.0B.
     \item In SciQ, Verbalized AUROC fluctuates between 0.513 and 0.547, showing virtually zero ability to distinguish correct choices from mistakes.
 \end{itemize}
-As revealed in the distribution analysis (Figure~\ref{fig:dist}), small instruction-tuned models exhibit severe mode collapse: when asked for a confidence number, models emit ``85'', ``90'', or ``95'' regardless of whether the generated answer is correct or absurdly erroneous.
+As revealed in the distribution analysis (Figure~\ref{fig:dist}), small instruction-tuned models exhibit severe mode collapse: when asked for a confidence number, models emit ``85'', ``90'', or ``95'' regardless of whether the generated answer is correct or erroneous.
 
 \subsection{Task Dependency of Self-Check P(True)}
 The self-check method $P(\text{True})$ exhibits strong domain divergence:
@@ -188,12 +207,13 @@ The self-check method $P(\text{True})$ exhibits strong domain divergence:
     \label{fig:dist}
 \end{figure}
 
-\section{Discussion and Limitations}
-\textbf{Why Verbalization Fails in Small Models.} Small models lack the metacognitive capacity to accurately inspect internal states during post-generation prompting. Instead of reflecting certainty, the verbalization prompt triggers conversational role-play training where confident numbers are favored. Consequently, verbalization scores are almost completely uninformative.
+\section{Discussion and Cascades}
+\textbf{Why Verbalization Fails in Small Models.} Small models lack the metacognitive capacity to inspect internal representations during post-hoc verbal prompting. Instead of reflecting certainty, the prompt triggers conversational role-play training where confident assertions are favored. Consequently, verbalization scores are almost completely uninformative.
 
 \textbf{Practical Implications for Cascades.} In cost-saving cascades~\cite{zhang2026confidence}, routing based on verbalized confidence in small models will misroute failing queries with high confidence. Small models should exclusively route using internal token probabilities or agreement across 3--5 consistency samples.
 
-\textbf{Limitations.} Our study was conducted within the Qwen2.5 family on two benchmark tasks. While this isolates model size as the controlled variable, future work should expand to additional architectures (e.g., Llama 3, Gemma 2) and evaluate post-hoc temperature scaling.
+\section{Limitations}
+Our empirical findings have three main boundaries: (1) we evaluated within the Qwen2.5 architecture family; future work should test cross-architecture transfer (e.g., Llama 3, Gemma 2); (2) benchmarks were restricted to open-domain and multiple-choice QA; multi-step math or code generation may exhibit different properties; (3) all methods were benchmarked in a zero-shot setting without post-hoc recalibration (e.g., temperature scaling).
 
 \section{Conclusion}
 This empirical investigation evaluates confidence calibration across small open LLMs (0.5B--7B). We show that the reported superiority of verbalized confidence in large models reverses completely in small models. For small models, length-normalized token probabilities and self-consistency provide robust discrimination (AUROC up to 0.909) and calibration (ECE down to 0.146), providing a clear operational guideline for deploying small LLMs in trustworthy systems.

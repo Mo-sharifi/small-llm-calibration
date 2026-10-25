@@ -165,6 +165,14 @@ pdflatex -interaction=nonstopmode report.tex
 
 ---
 
+### Limitations
+
+1. **Model Architecture Scope:** Experiments were conducted within the Qwen2.5 model family (0.5B to 7B) to isolate parameter scale while keeping tokenizer and training recipes constant. Evaluating across additional model families (e.g., Llama-3.2, Gemma-2, SmolLM) remains valuable future work.
+2. **Task Breadth:** The study focuses on open-domain factual generation (TriviaQA) and multiple-choice science examination (SciQ). Multi-hop reasoning (e.g., GSM8K) or open-ended generation may exhibit additional calibration factors.
+3. **Recalibration Techniques:** Confidence methods were benchmarked in a direct, zero-training setting without post-hoc recalibration techniques such as temperature scaling, conformal prediction, or distractor normalization.
+
+---
+
 ### Citation
 
 ```bibtex
